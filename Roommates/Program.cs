@@ -223,7 +223,7 @@ namespace Roommates
                                 }
                             }
                         }
-                        if(roomToDelete == -1)
+                        if (roomToDelete == -1)
                         {
                             break;
                         }
@@ -233,6 +233,51 @@ namespace Roommates
                             Console.WriteLine($"Deleted room with Id {roomToDelete}");
                             break;
                         }
+                    case 4:
+                        int roomToEditId = -1;
+                        while (true)
+                        {
+                            Console.WriteLine("Enter Id of room to edit");
+                            bool allowed = int.TryParse(Console.ReadLine(), out roomToEditId);
+                            if(allowed && allRoomIds.Contains(roomToEditId))
+                            {
+                                Room roomToEdit = roomRepo.GetById(roomToEditId);
+                                Console.WriteLine($"{roomToEdit.Id} {roomToEdit.Name} {roomToEdit.MaxOccupancy}");
+                                Console.WriteLine("Room name: ");
+                                string newName = Console.ReadLine();
+                                if (newName == "")
+                                {
+                                    newName = roomToEdit.Name;
+                                }
+                                int newOcc = -1;
+                                while(true)
+                                {
+                                    Console.WriteLine("Max occupancy: ");
+                                    bool permitted = int.TryParse(Console.ReadLine(), out newOcc);
+                                    if(permitted && newOcc > 0)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Value must be a number > 0.");
+                                    }
+                                }
+
+                                Room editedRoom = new Room { };
+                                editedRoom.Id = roomToEditId;
+                                editedRoom.Name = newName;
+                                editedRoom.MaxOccupancy = newOcc;
+                                roomRepo.Update(editedRoom);
+                                Console.WriteLine($"Edited room: {editedRoom.Id} {editedRoom.Name} {editedRoom.MaxOccupancy}");
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Room Id invalid. Please enter a valid Id.");
+                            }
+                        }
+                        break;
                 };
             }
         }
