@@ -126,7 +126,7 @@ namespace Roommates
 
                     string resp = Console.ReadLine();
 
-                    if(resp == "")
+                    if (resp == "")
                     {
                         app = false;
                         break;
@@ -200,6 +200,39 @@ namespace Roommates
                         roomRepo.Insert(newRoom);
                         Console.WriteLine($"Added {newRoom.Name} with id {newRoom.Id}");
                         break;
+                    case 3:
+                        int roomToDelete = -1;
+                        while (true)
+                        {
+                            Console.WriteLine("Input Id of room to be deleted: ");
+                            string response = Console.ReadLine();
+                            if (response == "")
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                bool allowed = int.TryParse(response, out roomToDelete);
+                                if (allowed && allRoomIds.Contains(roomToDelete))
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Room does not exist. Please enter a valid room Id.");
+                                }
+                            }
+                        }
+                        if(roomToDelete == -1)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            roomRepo.Delete(roomToDelete);
+                            Console.WriteLine($"Deleted room with Id {roomToDelete}");
+                            break;
+                        }
                 };
             }
         }
