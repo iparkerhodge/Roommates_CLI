@@ -315,6 +315,53 @@ namespace Roommates
                                 Room: {singleRoommate.Room.Name}
                             ");
                         break;
+                    case 7:
+                        Console.WriteLine("Roommate first name:");
+                        string roommateFirstName = Console.ReadLine();
+                        Console.WriteLine("Roommate last name:");
+                        string roommateLastName = Console.ReadLine();
+                        int RentPortion = -1;
+                        while (true)
+                        {
+                            Console.WriteLine("Rent Portion: ");
+                            bool allowed = int.TryParse(Console.ReadLine(), out RentPortion);
+                            if (allowed && RentPortion > 0 && RentPortion < 100)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Value must be a number between 0 and 100");
+                            }
+                        }
+                        int RoomId = -1;
+                        while (true)
+                        {
+                            Console.WriteLine("Room Id: ");
+                            bool allowed = int.TryParse(Console.ReadLine(), out RoomId);
+                            if (allowed && allRoomIds.Contains(RoomId))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Room does not exist. Enter a valid room Id.");
+                            }
+                        }
+                        Roommate newRoommate = new Roommate
+                        {
+                            Firstname = roommateFirstName,
+                            Lastname = roommateLastName,
+                            RentPortion = RentPortion,
+                            MovedInDate = DateTime.Now,
+                            Room = new Room
+                            {
+                                Id = RoomId
+                            }
+                        };
+                        roommateRepo.Insert(newRoommate);
+                        Console.WriteLine($"Added {newRoommate.Firstname} {newRoommate.Lastname} with id {newRoommate.Id}");
+                        break;
                 };
             }
         }
