@@ -99,6 +99,8 @@ namespace Roommates
 
             int choice = -1;
 
+            List<int> allRoomIds = roomRepo.GetAllIds();
+
             while (true)
             {
                 Console.WriteLine(@"
@@ -138,6 +140,25 @@ namespace Roommates
                     {
                         Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
                     }
+                    break;
+                case 1:
+                    int roomId = -1;
+                    while(true)
+                    {
+                        Console.WriteLine("Input Room Id: ");
+                        bool allowed = int.TryParse(Console.ReadLine(), out roomId);
+                        if (allowed && allRoomIds.Contains(roomId))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid Id. Choice is not an interger or Id does not exist.");
+                        }
+                    }
+                    Console.WriteLine($"Getting Room with Id {roomId}");
+                    Room singleRoom = roomRepo.GetById(roomId);
+                    Console.WriteLine($"{singleRoom.Id} {singleRoom.Name} {singleRoom.MaxOccupancy}");
                     break;
             };
         }
