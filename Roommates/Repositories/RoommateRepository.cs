@@ -149,5 +149,73 @@ namespace Roommates.Repositories
 
             }
         }
+
+        public void Insert(Roommate roommate)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    // These SQL parameters are annoying. Why can't we use string interpolation?
+                    // ... sql injection attacks!!!
+                    cmd.CommandText = @"INSERT INTO Roommate (FirstName, LastName, RentPortion, MoveInDate, RoomId) 
+                                         OUTPUT INSERTED.Id 
+                                         VALUES (@firstName, @lastName, @rentPortion, @moveInDate, @roomId)";
+                    cmd.Parameters.AddWithValue("@firstName", roommate.Firstname);
+                    cmd.Parameters.AddWithValue("@lastName", roommate.Lastname);
+                    cmd.Parameters.AddWithValue("@rentPortion", roommate.RentPortion);
+                    cmd.Parameters.AddWithValue("@moveInDate", roommate.MovedInDate);
+                    cmd.Parameters.AddWithValue("@roomId", roommate.Room.Id);
+                    int id = (int)cmd.ExecuteScalar();
+
+                    roommate.Id = id;
+                }
+            }
+
+            // when this method is finished we can look in the database and see the new room.
+        }
+
+        public void Update(Roommate roommate)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Roommate
+                                    SET FirstName = @firstName,
+                                        LastName = @lastName,
+                                        RentPortion = @rentPortion,
+                                        MoveInDate = @MoveInDate,
+                                        RoomId = @roomId
+                                    WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@firstName", roommate.Firstname);
+                    cmd.Parameters.AddWithValue("@lastName", roommate.Lastname);
+                    cmd.Parameters.AddWithValue("@rentPortion", roommate.RentPortion);
+                    cmd.Parameters.AddWithValue("@MoveInDate", roommate.MovedInDate);
+                    cmd.Parameters.AddWithValue("@RoomId", roommate.Room.Id);
+                    cmd.Parameters.AddWithValue("@id", roommate.Id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+
+        }
+
+        public void Delete(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM Roommate WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

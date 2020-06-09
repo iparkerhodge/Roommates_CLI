@@ -57,9 +57,9 @@ namespace Roommates
 
             //roomRepo.Update(updatedBathroom);
 
-            RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
+            //RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
 
-            Console.WriteLine("Getting all roommates: ");
+            //Console.WriteLine("Getting all roommates: ");
 
             //List<Roommate> roommates = roommateRepo.GetAll();
 
@@ -81,19 +81,65 @@ namespace Roommates
             //        Move In Date: {id1.MovedInDate}
             //    ");
 
-            List<Roommate> roommates = roommateRepo.GetAllWithRoom();
+            //List<Roommate> roommates = roommateRepo.GetAllWithRoom();
 
-            foreach (Roommate rm in roommates)
+            //foreach (Roommate rm in roommates)
+            //{
+            //    Console.WriteLine(@$"
+            //        Id: {rm.Id}
+            //        {rm.Firstname} {rm.Lastname}
+            //        Rent Portion: {rm.RentPortion}
+            //        Move In Date: {rm.MovedInDate}
+            //        Room: {rm.Room.Name}
+            //    ");
+            //}
+
+            RoomRepository roomRepo = new RoomRepository(CONNECTION_STRING);
+            RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
+
+            int choice = -1;
+
+            while (true)
             {
-                Console.WriteLine(@$"
-                    Id: {rm.Id}
-                    {rm.Firstname} {rm.Lastname}
-                    Rent Portion: {rm.RentPortion}
-                    Move In Date: {rm.MovedInDate}
-                    Room: {rm.Room.Name}
+                Console.WriteLine(@"
+                Welcome to Chore Manager!
+                -------------------------
+                Select an option:
+                0 List all rooms
+                1 List room by Id
+                2 Add a room
+                3 Delete a room
+                4 Edit a room
+                5 List all roommates
+                6 List roommate by Id
+                7 Add a roommate
+                8 Edit a roommate
+                9 Delete a roommate
                 ");
+
+                bool allowed = int.TryParse(Console.ReadLine(), out choice);
+
+                if (allowed && choice >= 0 && choice < 10)
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Not a valid choice.");
+                }
+
             }
 
+            switch(choice)
+            {
+                case 0:
+                    List<Room> allRooms = roomRepo.GetAll();
+                    foreach (Room room in allRooms)
+                    {
+                        Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
+                    }
+                    break;
+            };
         }
     }
 }
