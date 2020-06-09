@@ -64,7 +64,10 @@ namespace Roommates.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT FirstName, LastName, RentPortion, MoveInDate FROM Roommate WHERE Id = @id";
+                    cmd.CommandText = @"SELECT FirstName, LastName, RentPortion, MoveInDate, Name, MaxOccupancy, RoomId 
+                                        FROM Roommate rm
+                                        JOIN Room room ON room.Id = rm.RoomId
+                                        WHERE rm.Id = @id";
                     cmd.Parameters.AddWithValue("@id", id);
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -79,7 +82,12 @@ namespace Roommates.Repositories
                             Lastname = reader.GetString(reader.GetOrdinal("LastName")),
                             RentPortion = reader.GetInt32(reader.GetOrdinal("RentPortion")),
                             MovedInDate = reader.GetDateTime(reader.GetOrdinal("MoveInDate")),
-                            Room = null
+                            Room = new Room
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("RoomId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                MaxOccupancy = reader.GetInt32(reader.GetOrdinal("MaxOccupancy"))
+                            }
                         };
                     }
 
@@ -214,6 +222,57 @@ namespace Roommates.Repositories
                     cmd.CommandText = "DELETE FROM Roommate WHERE Id = @id";
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public List<int> GetAllIds()
+        {
+            //  We must "use" the database connection.
+            //  Because a database is a shared resource (other applications may be using it too) we must
+            //  be careful about how we interact with it. Specifically, we Open() connections when we need to
+            //  interact with the database and we Close() them when we're finished.
+            //  In C#, a "using" block ensures we correctly disconnect from a resource even if there is an error.
+            //  For database connections, this means the connection will be properly closed.
+            using (SqlConnection conn = Connection)
+            {
+                // Note, we must Open() the connection, the "using" block doesn't do that for us.
+                conn.Open();
+
+                // We must "use" commands too.
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    // Here we setup the command with the SQL we want to execute before we execute it.
+                    cmd.CommandText = "SELECT Id FROM Roommate";
+
+                    // Execute the SQL in the database and get a "reader" that will give us access to the data.
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    // A list to hold the rooms we retrieve from the database.
+                    List<int> allIds = new List<int>();
+
+                    // Read() will return true if there's more data to read
+                    while (reader.Read())
+                    {
+                        // The "ordinal" is the numeric position of the column in the query results.
+                        //  For our query, "Id" has an ordinal value of 0 and "Name" is 1.
+                        int idColumnPosition = reader.GetOrdinal("Id");
+
+                        // We user the reader's GetXXX methods to get the value for a particular ordinal.
+                        int idValue = reader.GetInt32(idColumnPosition);
+
+                        // Now let's create a new room object using the data from the database.
+                        int id = idValue;
+
+                        // ...and add that room object to our list.
+                        allIds.Add(id);
+                    }
+
+                    // We should Close() the reader. Unfortunately, a "using" block won't work here.
+                    reader.Close();
+
+                    // Return the list of rooms who whomever called this method.
+                    return allIds;
                 }
             }
         }

@@ -105,6 +105,7 @@ namespace Roommates
                 int choice = -1;
 
                 List<int> allRoomIds = roomRepo.GetAllIds();
+                List<int> allRoommateIds = roommateRepo.GetAllIds();
 
                 while (true)
                 {
@@ -277,6 +278,42 @@ namespace Roommates
                                 Console.WriteLine("Room Id invalid. Please enter a valid Id.");
                             }
                         }
+                        break;
+                    case 5:
+                        List<Roommate> allRoommates = roommateRepo.GetAllWithRoom();
+                        foreach(Roommate rm in allRoommates)
+                        {
+                            Console.WriteLine(@$"
+                                Id: {rm.Id}
+                                {rm.Firstname} {rm.Lastname}
+                                Rent Portion: {rm.RentPortion}
+                                Move In Date: {rm.MovedInDate}
+                            ");
+                        }
+                        break;
+                    case 6:
+                        int roommateId = -1;
+                        while (true)
+                        {
+                            Console.WriteLine("Input Roommate Id: ");
+                            bool allowed = int.TryParse(Console.ReadLine(), out roommateId);
+                            if (allowed && allRoommateIds.Contains(roommateId))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid Id. Choice is not an interger or Id does not exist.");
+                            }
+                        }
+                        Console.WriteLine($"Getting Roommate with Id {roommateId}");
+                        Roommate singleRoommate = roommateRepo.GetById(roommateId);
+                        Console.WriteLine(@$"
+                                {singleRoommate.Firstname} {singleRoommate.Lastname}
+                                Rent Portion: {singleRoommate.RentPortion}
+                                Move In Date: {singleRoommate.MovedInDate},
+                                Room: {singleRoommate.Room.Name}
+                            ");
                         break;
                 };
             }
