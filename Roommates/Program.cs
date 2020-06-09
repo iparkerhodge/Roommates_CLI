@@ -97,13 +97,18 @@ namespace Roommates
             RoomRepository roomRepo = new RoomRepository(CONNECTION_STRING);
             RoommateRepository roommateRepo = new RoommateRepository(CONNECTION_STRING);
 
-            int choice = -1;
+            bool app = true;
 
-            List<int> allRoomIds = roomRepo.GetAllIds();
-
-            while (true)
+            while (app == true)
             {
-                Console.WriteLine(@"
+
+                int choice = -1;
+
+                List<int> allRoomIds = roomRepo.GetAllIds();
+
+                while (true)
+                {
+                    Console.WriteLine(@"
                 Welcome to Chore Manager!
                 -------------------------
                 Select an option:
@@ -119,48 +124,84 @@ namespace Roommates
                 9 Delete a roommate
                 ");
 
-                bool allowed = int.TryParse(Console.ReadLine(), out choice);
+                    string resp = Console.ReadLine();
 
-                if (allowed && choice >= 0 && choice < 10)
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine("Not a valid choice.");
-                }
-
-            }
-
-            switch(choice)
-            {
-                case 0:
-                    List<Room> allRooms = roomRepo.GetAll();
-                    foreach (Room room in allRooms)
+                    if(resp == "")
                     {
-                        Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
+                        app = false;
+                        break;
                     }
-                    break;
-                case 1:
-                    int roomId = -1;
-                    while(true)
+                    else
                     {
-                        Console.WriteLine("Input Room Id: ");
-                        bool allowed = int.TryParse(Console.ReadLine(), out roomId);
-                        if (allowed && allRoomIds.Contains(roomId))
+                        bool allowed = int.TryParse(resp, out choice);
+
+                        if (allowed && choice >= 0 && choice < 10)
                         {
                             break;
                         }
                         else
                         {
-                            Console.WriteLine("Invalid Id. Choice is not an interger or Id does not exist.");
+                            Console.WriteLine("Not a valid choice.");
                         }
                     }
-                    Console.WriteLine($"Getting Room with Id {roomId}");
-                    Room singleRoom = roomRepo.GetById(roomId);
-                    Console.WriteLine($"{singleRoom.Id} {singleRoom.Name} {singleRoom.MaxOccupancy}");
-                    break;
-            };
+
+                }
+
+                switch (choice)
+                {
+                    case 0:
+                        List<Room> allRooms = roomRepo.GetAll();
+                        foreach (Room room in allRooms)
+                        {
+                            Console.WriteLine($"{room.Id} {room.Name} {room.MaxOccupancy}");
+                        }
+                        break;
+                    case 1:
+                        int roomId = -1;
+                        while (true)
+                        {
+                            Console.WriteLine("Input Room Id: ");
+                            bool allowed = int.TryParse(Console.ReadLine(), out roomId);
+                            if (allowed && allRoomIds.Contains(roomId))
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Invalid Id. Choice is not an interger or Id does not exist.");
+                            }
+                        }
+                        Console.WriteLine($"Getting Room with Id {roomId}");
+                        Room singleRoom = roomRepo.GetById(roomId);
+                        Console.WriteLine($"{singleRoom.Id} {singleRoom.Name} {singleRoom.MaxOccupancy}");
+                        break;
+                    case 2:
+                        Console.WriteLine("Room name:");
+                        string roomName = Console.ReadLine();
+                        int maxOcc = -1;
+                        while (true)
+                        {
+                            Console.WriteLine("Maximum occupancy: ");
+                            bool allowed = int.TryParse(Console.ReadLine(), out maxOcc);
+                            if (allowed && maxOcc > 0)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Value must be a postive number");
+                            }
+                        }
+                        Room newRoom = new Room
+                        {
+                            Name = roomName,
+                            MaxOccupancy = maxOcc
+                        };
+                        roomRepo.Insert(newRoom);
+                        Console.WriteLine($"Added {newRoom.Name} with id {newRoom.Id}");
+                        break;
+                };
+            }
         }
     }
 }
